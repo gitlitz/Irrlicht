@@ -5,9 +5,11 @@
  *      Author: yuval
  */
 #include <stdio.h>
+#include "Game.h"
 int main()
 {
-	printf("hello world");
+	Game g=Game();
+	g.start();
 	return 0;
 }
 
