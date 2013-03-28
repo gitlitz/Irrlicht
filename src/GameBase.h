@@ -9,6 +9,7 @@
 #define GAMEBASE_H_
 
 #include <irrlicht.h>
+#include "Input.h"
 
 using namespace irr;
 
@@ -32,8 +33,6 @@ public:
 
 protected:
 	virtual void update()=0;
-
-
 
 };
 

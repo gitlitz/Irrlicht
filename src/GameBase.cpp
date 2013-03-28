@@ -15,7 +15,7 @@ IGUIEnvironment *GameBase::guienv=NULL;
 
 GameBase::GameBase() {
 	// TODO Auto-generated constructor stub
-	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true);
+	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,Input::GetInstance());
 
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
