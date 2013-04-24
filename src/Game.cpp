@@ -9,6 +9,7 @@
 
 Game::Game() {
 	guienv->addStaticText(L"hello world",rect<signed int>(0,0,50,50),true);
+
 }
 
 Game::~Game() {

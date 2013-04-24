@@ -6,7 +6,7 @@
  */
 
 #include "GameBase.h"
-
+#include "Input.h"
 IrrlichtDevice *GameBase::device=NULL;
 IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
