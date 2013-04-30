@@ -15,9 +15,9 @@ public:
 	Game();
 	virtual ~Game();
 protected:
-	void update();
+	bool update();
 private:
-
+	ISceneNode* cube;
 };
 
 #endif /* GAME_H_ */

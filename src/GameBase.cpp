@@ -28,9 +28,9 @@ GameBase::~GameBase() {
 }
 
 void GameBase::start() {
-	while(device->run())
+	while(update()&&device->run())
 	{
-		update();
+
 		driver->beginScene(true, true, SColor(255,100,101,140));
 		smgr->drawAll();
 		guienv->drawAll();

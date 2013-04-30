@@ -32,7 +32,7 @@ public:
 	static IGUIEnvironment* guienv;
 
 protected:
-	virtual void update()=0;
+	virtual bool update()=0;
 
 };
 
