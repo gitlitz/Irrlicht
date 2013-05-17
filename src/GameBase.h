@@ -33,7 +33,11 @@ public:
 
 protected:
 	virtual bool update()=0;
+	//can be used only in the constructor
+	ITriangleSelector *mapSelector;
 
+private:
+	void create_mapSelector();
 };
 
 #endif /* GAMEBASE_H_ */

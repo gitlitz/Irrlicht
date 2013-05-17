@@ -20,7 +20,7 @@ GameBase::GameBase() {
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	guienv = device->getGUIEnvironment();
-
+	create_mapSelector();
 }
 
 GameBase::~GameBase() {
@@ -28,13 +28,30 @@ GameBase::~GameBase() {
 }
 
 void GameBase::start() {
+	mapSelector->drop();
 	while(update()&&device->run())
 	{
-
 		driver->beginScene(true, true, SColor(255,100,101,140));
 		smgr->drawAll();
 		guienv->drawAll();
 
 		driver->endScene();
 	}
+}
+
+void GameBase::create_mapSelector() {
+	device->getFileSystem()->addFileArchive("media/map.pk3");
+	IAnimatedMesh* q3levelmesh = smgr->getMesh("20kdm2.bsp");
+
+	if(!q3levelmesh)
+	{
+		puts("failed to load map map.pk3");
+		exit(1);
+	}
+	IMeshSceneNode* mapNode =smgr->addOctreeSceneNode(q3levelmesh->getMesh(0));
+	q3levelmesh->drop();
+	mapNode->setPosition(vector3d<float>(0,0,0));
+
+	mapSelector=smgr->createOctreeTriangleSelector(mapNode->getMesh(),mapNode);
+
 }

@@ -20,7 +20,7 @@ bool Input::IsKeyDown(EKEY_CODE keyCode) const {
 }
 
 bool Input::IsKeyPressed(EKEY_CODE keyCode) const {
-	return KeyIsDown[keyCode];
+	return KeyIsPressed[keyCode];
 }
 
 Input::Input() {
@@ -38,7 +38,6 @@ Input::~Input() {
 bool Input::OnEvent(const SEvent& event) {
 	if (event.EventType == EET_KEY_INPUT_EVENT)
 	{
-		//keypressed
 		if(KeyIsDown[event.KeyInput.Key] != event.KeyInput.PressedDown)
 		{
 			KeyIsPressed[event.KeyInput.Key]= event.KeyInput.PressedDown;
@@ -49,7 +48,6 @@ bool Input::OnEvent(const SEvent& event) {
 		}
 		else
 			KeyIsPressed[event.KeyInput.Key]=false;
-		//keydown
 		KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
 	}
 	return false;

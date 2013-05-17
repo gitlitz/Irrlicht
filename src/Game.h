@@ -18,6 +18,7 @@ protected:
 	bool update();
 private:
 	ISceneNode* cube;
+	ISceneNode* camera;
 };
 
 #endif /* GAME_H_ */

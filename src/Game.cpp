@@ -9,7 +9,7 @@
 #include <stdio.h>
 Game::Game() {
 	guienv->addStaticText(L"hello world",rect<signed int>(0,0,50,50),true);
-	ISceneNode* camera=smgr->addCameraSceneNodeFPS();
+	camera=smgr->addCameraSceneNodeFPS();
 	smgr->addLightSceneNode(camera);
 	cube=smgr->addCubeSceneNode(100);
 	cube->setPosition(vector3df(200,0,400));
@@ -25,9 +25,12 @@ Game::~Game() {
 bool Game::update() {
 	if(Input::GetInstance()->IsKeyDown(KEY_KEY_A))
 		cube->drop();
-
 	if(Input::GetInstance()->IsKeyDown(KEY_KEY_D))
 		cube->setRotation(vector3df(cube->getRotation().X+1,0,0));
+	printf("%d \n",Input::GetInstance()->IsKeyPressed(KEY_KEY_Q));
+
+	//if(Input::GetInstance()->IsKeyPressed(KEY_KEY_Q))
+	//	printf("camera pos:%f,%f,%f \n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
 	int fps = driver->getFPS();
 	stringw tmp(L"");
 	tmp += driver->getName();
