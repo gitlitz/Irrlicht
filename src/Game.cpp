@@ -11,6 +11,7 @@ Game::Game() {
 	guienv->addStaticText(L"hello world",rect<signed int>(0,0,50,50),true);
 	camera=smgr->addCameraSceneNodeFPS();
 	smgr->addLightSceneNode(camera);
+	camera->setPosition(vector3df(1478, 462, 886));
 	cube=smgr->addCubeSceneNode(100);
 	cube->setPosition(vector3df(200,0,400));
 	smgr->addCubeSceneNode(100,cube)->setPosition(vector3df(0,0,400));
@@ -23,19 +24,14 @@ Game::~Game() {
 }
 
 bool Game::update() {
-	if(Input::GetInstance()->IsKeyDown(KEY_KEY_A))
-		cube->drop();
-	if(Input::GetInstance()->IsKeyDown(KEY_KEY_D))
-		cube->setRotation(vector3df(cube->getRotation().X+1,0,0));
-	printf("%d \n",Input::GetInstance()->IsKeyPressed(KEY_KEY_Q));
+	if(Input::GetInstance()->getKeyState(KEY_KEY_P)==PRESSED)
+		printf("pos:%1.0f, %1.0f, %1.0f\n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
 
-	//if(Input::GetInstance()->IsKeyPressed(KEY_KEY_Q))
-	//	printf("camera pos:%f,%f,%f \n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
 	int fps = driver->getFPS();
 	stringw tmp(L"");
 	tmp += driver->getName();
 	tmp += L"] fps: ";
 	tmp += fps;
 	device->setWindowCaption(tmp.c_str());
-	return !Input::GetInstance()->IsKeyPressed(KEY_ESCAPE);
+	return Input::GetInstance()->getKeyState(KEY_ESCAPE)!=PRESSED;
 }

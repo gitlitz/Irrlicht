@@ -8,6 +8,6 @@
 #ifndef DEBUG_SETTINGS_H_
 #define DEBUG_SETTINGS_H_
 
-#define DEBUG_KEY_PRESSED
+
 
 #endif /* DEBUG_SETTINGS_H_ */

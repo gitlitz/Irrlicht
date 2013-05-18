@@ -25,18 +25,21 @@ GameBase::GameBase() {
 
 GameBase::~GameBase() {
 	device->drop();
+	delete Input::GetInstance();
 }
 
 void GameBase::start() {
 	mapSelector->drop();
-	while(update()&&device->run())
+	while(device->run()&&update())
 	{
+
 		driver->beginScene(true, true, SColor(255,100,101,140));
 		smgr->drawAll();
 		guienv->drawAll();
-
+		Input::GetInstance()->update();
 		driver->endScene();
 	}
+
 }
 
 void GameBase::create_mapSelector() {

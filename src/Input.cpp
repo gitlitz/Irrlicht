@@ -15,20 +15,22 @@ Input* Input::GetInstance() {
 	return instance;
 }
 
-bool Input::IsKeyDown(EKEY_CODE keyCode) const {
-	return KeyIsDown[keyCode];
+enum KeyState Input::getKeyState(EKEY_CODE keyCode) const {
+	return keys[keyCode];
 }
 
-bool Input::IsKeyPressed(EKEY_CODE keyCode) const {
-	return KeyIsPressed[keyCode];
+void Input::update() {
+	for (int i = 0; i < KEY_KEY_CODES_COUNT; ++i) {
+		if(keys[i]==PRESSED)
+			keys[i]=DOWN;
+		else if(keys[i]==RELEASED)
+			keys[i]=UP;
+	}
 }
 
 Input::Input() {
 	for (u32 i=0; i<KEY_KEY_CODES_COUNT; ++i)
-	{
-		KeyIsDown[i] = false;
-		KeyIsPressed[i] = false;
-	}
+		keys[i]=UP;
 }
 
 Input::~Input() {
@@ -38,17 +40,14 @@ Input::~Input() {
 bool Input::OnEvent(const SEvent& event) {
 	if (event.EventType == EET_KEY_INPUT_EVENT)
 	{
-		if(KeyIsDown[event.KeyInput.Key] != event.KeyInput.PressedDown)
+		if(event.KeyInput.PressedDown)
 		{
-			KeyIsPressed[event.KeyInput.Key]= event.KeyInput.PressedDown;
-#ifdef DEBUG_KEY_PRESSED
-			if(event.KeyInput.PressedDown)
-				printf("key pressed %d \n",event.KeyInput.Key);
-#endif
+			if(keys[event.KeyInput.Key]!=DOWN)
+				keys[event.KeyInput.Key]=PRESSED;
 		}
 		else
-			KeyIsPressed[event.KeyInput.Key]=false;
-		KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+			keys[event.KeyInput.Key]=RELEASED;
 	}
+
 	return false;
 }
