@@ -18,7 +18,8 @@ protected:
 	bool update();
 private:
 	ISceneNode* cube;
-	ISceneNode* camera;
+	ICameraSceneNode* camera;
+	ISceneNodeAnimatorCollisionResponse* anim;
 };
 
 #endif /* GAME_H_ */

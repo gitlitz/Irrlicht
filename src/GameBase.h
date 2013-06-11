@@ -11,6 +11,8 @@
 #include <irrlicht.h>
 #include "Input.h"
 
+#include <map>
+#include <string>
 using namespace irr;
 
 using namespace core;
@@ -30,6 +32,9 @@ public:
 	static IVideoDriver* driver;
 	static ISceneManager* smgr;
 	static IGUIEnvironment* guienv;
+
+	static std::map<std::string,ISceneNode*> players;
+	static std::string seekerName;
 
 protected:
 	virtual bool update()=0;

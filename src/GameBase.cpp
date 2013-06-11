@@ -11,7 +11,8 @@ IrrlichtDevice *GameBase::device=NULL;
 IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
 IGUIEnvironment *GameBase::guienv=NULL;
-
+std::map<std::string,ISceneNode*> GameBase::players;
+std::string GameBase::seekerName="";
 
 GameBase::GameBase() {
 	// TODO Auto-generated constructor stub
@@ -32,7 +33,6 @@ void GameBase::start() {
 	mapSelector->drop();
 	while(device->run()&&update())
 	{
-
 		driver->beginScene(true, true, SColor(255,100,101,140));
 		smgr->drawAll();
 		guienv->drawAll();
@@ -45,7 +45,6 @@ void GameBase::start() {
 void GameBase::create_mapSelector() {
 	device->getFileSystem()->addFileArchive("media/map.pk3");
 	IAnimatedMesh* q3levelmesh = smgr->getMesh("20kdm2.bsp");
-
 	if(!q3levelmesh)
 	{
 		puts("failed to load map map.pk3");

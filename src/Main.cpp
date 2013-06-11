@@ -6,11 +6,34 @@
  */
 #include <stdio.h>
 #include "Game.h"
+#include <SFML/Network.hpp>
+#include "Network/Server.h"
+void server();
+void client();
 int main()
 {
+	char who;
+	puts("Do you want to be a server (s) or a client (c) ?");
+	who=getchar();
+	if(who=='s')
+		server();
+	else
+		client();
+	return 0;
 	Game g=Game();
 	g.start();
 	return 0;
 }
 
+void server()
+{
+	Server::GetInstance();
+}
 
+void client()
+{
+	puts("what is your name?");
+	char c[128];
+	fgets(c,128,stdin);
+
+}

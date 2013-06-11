@@ -8,19 +8,27 @@
 #include "Game.h"
 #include <stdio.h>
 Game::Game() {
-	guienv->addStaticText(L"hello world",rect<signed int>(0,0,50,50),true);
-	camera=smgr->addCameraSceneNodeFPS();
+
+	device->getCursorControl()->setVisible(false);
+
+	camera=smgr->addCameraSceneNodeFPS(0, 100.0f, .3f, -1, 0, 0, true, 5.f);
+
 	smgr->addLightSceneNode(camera);
 	camera->setPosition(vector3df(1478, 462, 886));
 	cube=smgr->addCubeSceneNode(100);
 	cube->setPosition(vector3df(200,0,400));
-	smgr->addCubeSceneNode(100,cube)->setPosition(vector3df(0,0,400));
+	anim = smgr->createCollisionResponseAnimator(
+			mapSelector, camera, core::vector3df(30,50,30),
+			core::vector3df(0,-10,0), core::vector3df(0,30,0));
+	//Danny was here!!!
+	camera->addAnimator(anim);
+	anim->drop();
 
 }
 
 Game::~Game() {
 	// TODO Auto-generated destructor stub
-
+	camera->removeAnimators();
 }
 
 bool Game::update() {
