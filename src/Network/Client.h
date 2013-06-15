@@ -8,11 +8,12 @@
 #ifndef CLIENT_H_
 #define CLIENT_H_
 #include <string>
+#include "../GameBase.h"
 void* ClientRecvThread(void* socket);
 
-class Client {
+class Client:GameBase {
 public:
-	Client(std::string name);
+	Client();
 	virtual ~Client();
 };
 

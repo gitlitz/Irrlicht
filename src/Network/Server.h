@@ -28,15 +28,23 @@ void *RecvThread(void* socket);
 class Server {
 public:
 	static const unsigned short PORT = 5000;
-	virtual ~Server();
 	void StopListening();
 	void SendMsg(const char *c);
-	static Server* GetInstance();
+	void Forward(unsigned short senderPort,const char *msg);
+	static Server& GetInstance()
+	{
+		static Server inst;
+		return inst;
+	}
 private:
 	Server();
-	static Server* instance;
 	ListenThreadArgs listenArgs;
 	pthread_t listen;
+protected:
+	Server(const Server&); // Prevent construction by copying
+	Server& operator=(const Server&); // Prevent assignment
+	~Server(); // Prevent unwanted destruction
+
 
 };
 

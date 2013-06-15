@@ -12,6 +12,7 @@ void server();
 void client();
 int main()
 {
+
 	char who;
 	puts("Do you want to be a server (s) or a client (c) ?");
 	who=getchar();
@@ -23,6 +24,7 @@ int main()
 	Game g=Game();
 	g.start();
 	return 0;
+
 }
 
 void server()
@@ -32,8 +34,5 @@ void server()
 
 void client()
 {
-	puts("what is your name?");
-	char c[128];
-	fgets(c,128,stdin);
 
 }

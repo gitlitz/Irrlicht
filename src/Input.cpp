@@ -9,11 +9,6 @@
 #include "stdio.h"
 #include "debug settings.h"
 Input* Input::instance=NULL;
-Input* Input::GetInstance() {
-	if(instance==NULL)
-		instance=new Input();
-	return instance;
-}
 
 enum KeyState Input::getKeyState(EKEY_CODE keyCode) const {
 	return keys[keyCode];

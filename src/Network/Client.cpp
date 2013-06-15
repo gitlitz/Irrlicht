@@ -32,7 +32,7 @@ void* ClientRecvThread(void* socket)
 }
 
 
-Client::Client(std::string name) {
+Client::Client() {
 	IpAddress server("127.0.0.1");
 
 	// Create a socket for communicating with the server

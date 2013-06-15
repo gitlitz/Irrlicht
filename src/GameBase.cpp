@@ -11,13 +11,10 @@ IrrlichtDevice *GameBase::device=NULL;
 IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
 IGUIEnvironment *GameBase::guienv=NULL;
-std::map<std::string,ISceneNode*> GameBase::players;
-std::string GameBase::seekerName="";
 
 GameBase::GameBase() {
 	// TODO Auto-generated constructor stub
-	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,Input::GetInstance());
-
+	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,&Input::GetInstance());
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	guienv = device->getGUIEnvironment();
@@ -26,7 +23,6 @@ GameBase::GameBase() {
 
 GameBase::~GameBase() {
 	device->drop();
-	delete Input::GetInstance();
 }
 
 void GameBase::start() {
@@ -36,7 +32,7 @@ void GameBase::start() {
 		driver->beginScene(true, true, SColor(255,100,101,140));
 		smgr->drawAll();
 		guienv->drawAll();
-		Input::GetInstance()->update();
+		Input::GetInstance().update();
 		driver->endScene();
 	}
 

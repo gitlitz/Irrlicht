@@ -9,13 +9,7 @@
 #include <SFML/Network.hpp>
 #include <stdio.h>
 #include <pthread.h>
-Server* Server::instance=NULL;
-
-Server* Server::GetInstance() {
-	if(instance==NULL)
-		instance=new Server();
-	return instance;
-}
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 Server::Server() {
 	if (listenArgs.listener.listen(PORT) != sf::Socket::Done)
@@ -46,13 +40,14 @@ void* ListenThread(void* listenThreadArgs) {
 			puts("failed to accept client");
 			return 0;
 		}
-		printf("connected %s\n",socket->getRemoteAddress().toString().c_str());
-		pthread_t recv;
-		pthread_create(&recv,NULL,RecvThread,socket);
+		pthread_mutex_lock( &mutex );
+		printf("connected %d\n",socket->getRemotePort());
 		ClientInfo client;
-		client.recvThread=recv;
+		pthread_create(&client.recvThread,NULL,RecvThread,socket);
 		client.socket=socket;
 		args->clients.push_back(client);
+		pthread_mutex_unlock( &mutex );
+
 	}
 	return 0;
 }
@@ -69,17 +64,28 @@ void* RecvThread(void* socket) {
 			return 0;
 		}
 		in[received]='\0';
-		printf("recv:%s\n",in);
-		Server::GetInstance()->SendMsg(in);
+		printf("recv from port %d:%s\n",s->getRemotePort(),in);
+		Server::GetInstance().Forward(s->getRemotePort(),in);
 	}
 	return 0;
 }
 
 void Server::StopListening() {
 	listenArgs.isListening=false;
+	pthread_mutex_lock( &mutex );
+	pthread_cancel(listen);
+	pthread_mutex_unlock( &mutex );
 }
-
+/*
+ *
+ */
 void Server::SendMsg(const char *c) {
 	for(auto i:listenArgs.clients)
 		i.socket->send(c,strlen(c));
+}
+
+void Server::Forward(unsigned short senderPort, const char* msg) {
+	for(auto i:listenArgs.clients)
+		if(i.socket->getRemotePort()!=senderPort)
+			i.socket->send(msg,strlen(msg));
 }

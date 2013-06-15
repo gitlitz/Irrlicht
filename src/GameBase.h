@@ -33,8 +33,6 @@ public:
 	static ISceneManager* smgr;
 	static IGUIEnvironment* guienv;
 
-	static std::map<std::string,ISceneNode*> players;
-	static std::string seekerName;
 
 protected:
 	virtual bool update()=0;

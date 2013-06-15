@@ -24,6 +24,7 @@ Game::Game() {
 	camera->addAnimator(anim);
 	anim->drop();
 
+
 }
 
 Game::~Game() {
@@ -32,14 +33,15 @@ Game::~Game() {
 }
 
 bool Game::update() {
-	if(Input::GetInstance()->getKeyState(KEY_KEY_P)==PRESSED)
+	if(Input::GetInstance().getKeyState(KEY_KEY_P)==PRESSED)
 		printf("pos:%1.0f, %1.0f, %1.0f\n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
-
+	if(Input::GetInstance().getKeyState(KEY_KEY_Q)==PRESSED)
+			camera->setInputReceiverEnabled(!camera->isInputReceiverEnabled());
 	int fps = driver->getFPS();
 	stringw tmp(L"");
 	tmp += driver->getName();
 	tmp += L"] fps: ";
 	tmp += fps;
 	device->setWindowCaption(tmp.c_str());
-	return Input::GetInstance()->getKeyState(KEY_ESCAPE)!=PRESSED;
+	return Input::GetInstance().getKeyState(KEY_ESCAPE)!=PRESSED;
 }
