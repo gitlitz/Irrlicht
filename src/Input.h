@@ -9,24 +9,18 @@
 #define INPUT_H_
 
 #include "IEventReceiver.h"
+#include "KeyState.h"
 using namespace irr;
-enum KeyState
-{
-	UP,
-	DOWN,
-	PRESSED,
-	RELEASED
-};
+
 class Input:public  IEventReceiver{
 public:
 	virtual bool OnEvent(const SEvent& event);
 //	static Input* GetInstance();
-	enum KeyState getKeyState(EKEY_CODE keyCode) const;
+	KeyState getKeyState(EKEY_CODE keyCode) const;
 	void update();
 private:
-	static Input* instance;
 	Input();
-	enum KeyState keys[KEY_KEY_CODES_COUNT];
+	KeyState keys[KEY_KEY_CODES_COUNT];
 public:
   static Input& GetInstance()
   {

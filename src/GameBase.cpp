@@ -11,14 +11,18 @@ IrrlichtDevice *GameBase::device=NULL;
 IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
 IGUIEnvironment *GameBase::guienv=NULL;
-
+ISceneNode *GameBase::seeker=NULL;
 GameBase::GameBase() {
 	// TODO Auto-generated constructor stub
 	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,&Input::GetInstance());
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	guienv = device->getGUIEnvironment();
+
 	create_mapSelector();
+	seeker=smgr->addCubeSceneNode(20);
+
+	//enemy->setPosition(vector3df(200,0,400))
 }
 
 GameBase::~GameBase() {

@@ -8,9 +8,9 @@
 #include "Input.h"
 #include "stdio.h"
 #include "debug settings.h"
-Input* Input::instance=NULL;
 
-enum KeyState Input::getKeyState(EKEY_CODE keyCode) const {
+
+KeyState Input::getKeyState(EKEY_CODE keyCode) const {
 	return keys[keyCode];
 }
 

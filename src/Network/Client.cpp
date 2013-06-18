@@ -1,19 +1,36 @@
 /*
  * Client.cpp
  *
- *  Created on: 7 αιεπ 2013
+ *  Created on: 18 αιεπ 2013
  *      Author: yuval
  */
 
 #include "Client.h"
-#include <SFML/Network.hpp>
-#include <stdio.h>
-#include <pthread.h>
 #include "Server.h"
-#include <iostream>
-using namespace sf;
-void* ClientRecvThread(void* socket)
+#include "../Game.h"
+void* ClientRecvThread(void* socket);
+sf::TcpSocket clientSocket;
+void StartClient()
 {
+	Game g;
+	IpAddress server("127.0.0.1");
+	if (clientSocket.connect(server, Server::PORT) != sf::Socket::Done)
+	{
+		puts("connection failed");
+		return;
+	}
+	pthread_t t;
+	pthread_create(&t,NULL,ClientRecvThread,&clientSocket);
+	g.start();
+}
+void SendPos(vector3df pos)
+{
+	char c[128];
+	sprintf(c,"%f,%f,%f",pos.X,pos.Y,pos.Z);
+	clientSocket.send(c,strlen(c));
+}
+
+void* ClientRecvThread(void* socket) {
 	TcpSocket *s=(TcpSocket*)socket;
 	char in[128];
 	size_t recieved;
@@ -27,44 +44,9 @@ void* ClientRecvThread(void* socket)
 		}
 		in[recieved]='\0';
 		puts(in);
+		vector3df pos;
+		sscanf(in,"%f,%f,%f",&pos.X,&pos.Y,&pos.Z);
+		GameBase::seeker->setPosition(pos);
 	}
 	return 0;
 }
-
-
-Client::Client() {
-	IpAddress server("127.0.0.1");
-
-	// Create a socket for communicating with the server
-	TcpSocket *socket;
-
-	// Connect to the server
-	if (socket->connect(server, Server::PORT) != sf::Socket::Done)
-	{
-		puts("connection failed");
-		return;
-
-	}
-	std::cout << "Connected to server " << server << std::endl;
-
-	// Receive a message from the server
-	// Send an answer to the server
-	pthread_t t;
-	pthread_create(&t,NULL,ClientRecvThread,&socket);
-	char c[128];
-	fgets(c,sizeof(c),stdin);
-	while (strcmp(c,"q\n")!=0)
-	{
-		fgets(c,sizeof(c),stdin);
-		if (socket->send(&c, sizeof(c)) != sf::Socket::Done)
-		{
-			puts("failed to send msg");
-			return;
-		}
-	}
-}
-
-Client::~Client() {
-	// TODO Auto-generated destructor stub
-}
-

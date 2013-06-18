@@ -7,6 +7,7 @@
 
 #include "Game.h"
 #include <stdio.h>
+#include "Network/Client.h"
 Game::Game() {
 
 	device->getCursorControl()->setVisible(false);
@@ -20,7 +21,6 @@ Game::Game() {
 	anim = smgr->createCollisionResponseAnimator(
 			mapSelector, camera, core::vector3df(30,50,30),
 			core::vector3df(0,-10,0), core::vector3df(0,30,0));
-	//Danny was here!!!
 	camera->addAnimator(anim);
 	anim->drop();
 
@@ -33,6 +33,7 @@ Game::~Game() {
 }
 
 bool Game::update() {
+	SendPos(camera->getPosition());
 	if(Input::GetInstance().getKeyState(KEY_KEY_P)==PRESSED)
 		printf("pos:%1.0f, %1.0f, %1.0f\n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
 	if(Input::GetInstance().getKeyState(KEY_KEY_Q)==PRESSED)

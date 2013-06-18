@@ -32,7 +32,7 @@ public:
 	static IVideoDriver* driver;
 	static ISceneManager* smgr;
 	static IGUIEnvironment* guienv;
-
+	static ISceneNode * seeker;
 
 protected:
 	virtual bool update()=0;

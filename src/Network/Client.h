@@ -1,20 +1,19 @@
 /*
  * Client.h
  *
- *  Created on: 7 αιεπ 2013
+ *  Created on: 18 αιεπ 2013
  *      Author: yuval
  */
 
 #ifndef CLIENT_H_
 #define CLIENT_H_
-#include <string>
+#include <stdio.h>
+#include <SFML/Network.hpp>
+#include <pthread.h>
 #include "../GameBase.h"
-void* ClientRecvThread(void* socket);
-
-class Client:GameBase {
-public:
-	Client();
-	virtual ~Client();
-};
-
+#include <map>
+using namespace std;
+using namespace sf;
+void StartClient();
+void SendPos(vector3df pos);
 #endif /* CLIENT_H_ */
