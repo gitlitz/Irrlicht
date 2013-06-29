@@ -15,10 +15,6 @@ void client();
 
 int main()
 {
-	//Game g=Game();
-	//g.start();
-	//return 0;
-
 	char who;
 	puts("Do you want to be a server (s) or a client (c) ?");
 	who=getchar();
@@ -28,19 +24,21 @@ int main()
 		client();
 	return 0;
 }
-
+/*
+ * run a server program
+ */
 void server()
 {
 	Server::GetInstance();
+	//block
 	getchar();
 	getchar();
 }
-
+/*
+ * run a client program
+ */
 void client()
 {
 	StartClient();
 }
-
-
-
 

@@ -15,13 +15,18 @@ using namespace irr;
 class Input:public  IEventReceiver{
 public:
 	virtual bool OnEvent(const SEvent& event);
-//	static Input* GetInstance();
+	/**
+	 * return the state of a button
+	 * @param keyCode button's code
+	 * @return the state of the button
+	 */
 	KeyState getKeyState(EKEY_CODE keyCode) const;
 	void update();
 private:
 	Input();
 	KeyState keys[KEY_KEY_CODES_COUNT];
 public:
+	//singleton
   static Input& GetInstance()
   {
       static Input inst;

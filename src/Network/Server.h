@@ -27,10 +27,23 @@ void *RecvThread(void* socket);
 
 class Server {
 public:
+	//port to bind for the server
 	static const unsigned short PORT = 5000;
+	//dont accept more clients
 	void StopListening();
+	/**
+	 * send a message to all the clients
+	 * @param c msg to be sent
+	 */
 	void SendMsg(const char *c);
+	/**
+	 * forward a message from a port to all
+	 * the other clients
+	 * @param senderPort the sender's port
+	 * @param msg msg to send to all the other clients
+	 */
 	void Forward(unsigned short senderPort,const char *msg);
+	//singleton
 	static Server& GetInstance()
 	{
 		static Server inst;
@@ -44,7 +57,6 @@ protected:
 	Server(const Server&); // Prevent construction by copying
 	Server& operator=(const Server&); // Prevent assignment
 	~Server(); // Prevent unwanted destruction
-
 
 };
 

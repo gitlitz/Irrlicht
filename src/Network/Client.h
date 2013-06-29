@@ -14,6 +14,11 @@
 #include <map>
 using namespace std;
 using namespace sf;
+//start a client program
 void StartClient();
-void SendPos(vector3df pos);
+/**
+ * send pos to the server
+ * @param pos pos to be sent
+ */
+void SendPos(vector3df pos,vector3df rot);
 #endif /* CLIENT_H_ */

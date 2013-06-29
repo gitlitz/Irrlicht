@@ -17,9 +17,21 @@ public:
 protected:
 	bool update();
 private:
-	ISceneNode* cube;
 	ICameraSceneNode* camera;
-	ISceneNodeAnimatorCollisionResponse* anim;
+	IAnimatedMeshSceneNode* npc;
+	ISceneNodeAnimatorCollisionResponse* npcCollision;
+	/**
+	 * update the npc. called on every iteration
+	 */
+	void updateNpc();
+	/**
+	 * create the npc node
+	 */
+	void loadNpc();
+	/**
+	 * load the camera
+	 */
+	void loadCamera();
 };
 
 #endif /* GAME_H_ */

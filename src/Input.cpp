@@ -33,6 +33,7 @@ Input::~Input() {
 }
 
 bool Input::OnEvent(const SEvent& event) {
+	//only check keyboard actions
 	if (event.EventType == EET_KEY_INPUT_EVENT)
 	{
 		if(event.KeyInput.PressedDown)

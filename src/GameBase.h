@@ -35,11 +35,16 @@ public:
 	static ISceneNode * seeker;
 
 protected:
+	/**
+	 * called before every iteration fo the game
+	 * @return should continue to run (not exit)
+	 */
 	virtual bool update()=0;
 	//can be used only in the constructor
 	ITriangleSelector *mapSelector;
 
 private:
+	//init the selector for the map
 	void create_mapSelector();
 };
 
