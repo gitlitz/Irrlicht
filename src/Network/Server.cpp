@@ -97,6 +97,7 @@ void* Server::RecvThread(void* recvThreadArgs) {
 				packet.clear();
 				packet<<Command::score;
 				socket->send(packet);
+				self->ReSpawnNode(hitNode);
 			}
 			break;
 		default:
@@ -134,4 +135,18 @@ ISceneNode* Server::shoot(Packet packet)
 
 	ISceneNode * selectedSceneNode=collMan->getSceneNodeAndCollisionPointFromRay(ray,intersection,hitTriangle);
 	return (selectedSceneNode);
+}
+
+void Server::ReSpawnNode(ISceneNode* node) {
+	for(auto i:players)
+		if(i.second==node)
+			for(auto j:clients)
+				if(j.socket->getRemoteAddress()==i.first.ip)
+					if(j.socket->getRemotePort()==i.first.port)
+					{
+						Packet packet;
+						packet<<Command::spawn;
+						j.socket->send(packet);
+						return;
+					}
 }

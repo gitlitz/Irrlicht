@@ -83,6 +83,10 @@ void* Client::RecvThread(void* client) {
 			self->score++;
 			packet.clear();
 			break;
+		case Command::spawn:
+			puts("spawned");
+			self->camera->setPosition(self->SPAWN_POINT);
+			break;
 		default:
 			puts("bad package");
 			break;
@@ -120,7 +124,7 @@ void Client::initCamera() {
 	camera=smgr->addCameraSceneNodeFPS(0, 100.0f, .3f, -1, keyMap, 9, true, 5.f);
 	//add dynamic light
 	smgr->addLightSceneNode(camera);
-	camera->setPosition(vector3df(1478, 462, 886));
+	camera->setPosition(SPAWN_POINT);
 	anim = smgr->createCollisionResponseAnimator(
 			mapSelector, camera,2*radius);
 	camera->addAnimator(anim);
@@ -132,6 +136,7 @@ void Client::shoot() {
 	Packet packet;
 	packet<<Command::score;
 	vector3df start=camera->getPosition();
+	start+=(camera->getTarget() - start).normalize()*23.0f;
 	packet<<start.X;
 	packet<<start.Y;
 	packet<<start.Z;

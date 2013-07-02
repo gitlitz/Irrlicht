@@ -24,12 +24,13 @@ using namespace core;
 enum Command
 {
 	move,
-	score
+	score,
+	spawn
 };
 
 struct ClientInfo
 {
-	short port;
+	unsigned short port;
 	sf::IpAddress ip;
 	 bool operator<( const ClientInfo & n ) const {
 		 if(this->ip==n.ip)
@@ -71,12 +72,13 @@ protected:
 	void MovePlayer(ClientInfo info,core::vector3df position,float rotY);
 	IAnimatedMeshSceneNode* CreateNewPlayerNode();
 	vector3df radius;
+	std::map<ClientInfo,IAnimatedMeshSceneNode*> players;
+
 private:
 	//init the selector for the map
 	void create_mapSelector();
 	void loadSampleNode();
 
-	std::map<ClientInfo,IAnimatedMeshSceneNode*> players;
 
 	IAnimatedMesh* playerMesh;
 	ITexture* playerTexture;

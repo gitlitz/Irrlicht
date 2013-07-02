@@ -31,5 +31,6 @@ private:
 	int score=0;
 	void initCamera();
 	void shoot();
+	const vector3df SPAWN_POINT=vector3df(1478, 462, 886);
 };
 #endif /* CLIENT_H_ */

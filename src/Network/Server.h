@@ -38,6 +38,7 @@ private:
 	std::vector<SocketThread> clients;
 	ISceneCollisionManager* collMan;
 	ISceneNode* shoot(Packet packet);
+	void ReSpawnNode(ISceneNode* node);
 };
 
 #endif /* SERVER_H_ */
