@@ -6,8 +6,8 @@
  */
 #include <stdio.h>
 #include <SFML/Network.hpp>
-#include "Network/Server.h"
 #include "Network/Client.h"
+#include "Network/Server.h"
 
 void server();
 void client();
@@ -29,16 +29,15 @@ int main()
  */
 void server()
 {
-	Server::GetInstance();
-	//block
-	getchar();
-	getchar();
+	Server s;
+	s.start();
 }
 /*
  * run a client program
  */
 void client()
 {
-	StartClient();
+	Client c;
+	c.start();
 }
 

@@ -11,18 +11,14 @@ IrrlichtDevice *GameBase::device=NULL;
 IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
 IGUIEnvironment *GameBase::guienv=NULL;
-ISceneNode *GameBase::seeker=NULL;
-GameBase::GameBase() {
+GameBase::GameBase(E_DRIVER_TYPE driver) {
 	// TODO Auto-generated constructor stub
 	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,&Input::GetInstance());
-	driver = device->getVideoDriver();
+	this->driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	guienv = device->getGUIEnvironment();
 
 	create_mapSelector();
-	seeker=smgr->addCubeSceneNode(20);
-
-	//enemy->setPosition(vector3df(200,0,400))
 }
 
 GameBase::~GameBase() {
@@ -56,4 +52,39 @@ void GameBase::create_mapSelector() {
 
 	mapSelector=smgr->createOctreeTriangleSelector(mapNode->getMesh(),mapNode);
 
+}
+
+void GameBase::MovePlayer(ClientInfo info, vector3df position,float rotY) {
+	ISceneNode* node;
+	if(players.find(info)==players.end())
+	{
+		//todo:error here
+		puts("new node");
+		node=smgr->addCubeSceneNode(100);//sampleNode->clone();
+		players[info]=node;
+	}
+	else
+		node=players[info];
+	node->setPosition(position);
+
+}
+
+void GameBase::loadSampleNode() {
+	IAnimatedMesh* mesh = smgr->getMesh("media/sydney.md2");
+
+	sampleNode=smgr->addAnimatedMeshSceneNode(mesh);
+	sampleNode->setMaterialTexture( 0, driver->getTexture("media/sydney.bmp") );
+	sampleNode->setPosition(vector3df(1278, 462, 886));
+	sampleNode->setMD2Animation(EMD2_ANIMATION_TYPE::EMAT_STAND);
+	//lighting
+	sampleNode->setMaterialFlag(EMF_LIGHTING, false);
+	//calculate the radius of the texture
+	/*const core::aabbox3d<f32>& box = sampleNode->getBoundingBox();
+	core::vector3df radius = box.MaxEdge - box.getCenter();
+	//add collision
+	ISceneNodeAnimatorCollisionResponse* collision = smgr->createCollisionResponseAnimator(
+			mapSelector, sampleNode, radius);
+	sampleNode->addAnimator(collision);
+	collision->drop();
+	*/
 }

@@ -7,7 +7,6 @@
 
 #include "Input.h"
 #include "stdio.h"
-#include "debug settings.h"
 
 
 KeyState Input::getKeyState(EKEY_CODE keyCode) const {

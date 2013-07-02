@@ -1,63 +1,41 @@
 /*
  * Server.h
  *
- *  Created on: 27 במאי 2013
+ *  Created on: 1 ביול 2013
  *      Author: yuval
  */
 
 #ifndef SERVER_H_
 #define SERVER_H_
-#include <pthread.h>
+
+#include "../GameBase.h"
 #include <SFML/Network.hpp>
-#include <map>
-using namespace std;
+#include <pthread.h>
+#include <vector>
 using namespace sf;
-
-struct ClientInfo{
+struct SocketThread
+{
 	TcpSocket* socket;
-	pthread_t recvThread;
+	pthread_t thread;
 };
-struct ListenThreadArgs{
-	TcpListener listener;
-	bool isListening;
-	vector<ClientInfo> clients;
-};
-void *ListenThread(void* listenThreadArgs);
-void *RecvThread(void* socket);
-
-class Server {
+class Server: public GameBase {
 public:
-	//port to bind for the server
-	static const unsigned short PORT = 5000;
-	//dont accept more clients
-	void StopListening();
-	/**
-	 * send a message to all the clients
-	 * @param c msg to be sent
-	 */
-	void SendMsg(const char *c);
-	/**
-	 * forward a message from a port to all
-	 * the other clients
-	 * @param senderPort the sender's port
-	 * @param msg msg to send to all the other clients
-	 */
-	void Forward(unsigned short senderPort,const char *msg);
-	//singleton
-	static Server& GetInstance()
-	{
-		static Server inst;
-		return inst;
-	}
-private:
 	Server();
-	ListenThreadArgs listenArgs;
-	pthread_t listen;
+	virtual ~Server();
+	static void* ListenThread(void* server);
+	static void* RecvThread(void* recvThreadArgs);
 protected:
-	Server(const Server&); // Prevent construction by copying
-	Server& operator=(const Server&); // Prevent assignment
-	~Server(); // Prevent unwanted destruction
-
+	bool update();
+private:
+	struct RecvThreadArgs
+	{
+		Server* self;
+		TcpSocket* socket;
+	};
+	void Forward(TcpSocket* sender,Packet packet);
+	pthread_t listenThread;
+	TcpListener listener;
+	std::vector<SocketThread> clients;
 };
 
 #endif /* SERVER_H_ */

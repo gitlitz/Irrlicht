@@ -1,105 +1,106 @@
 /*
  * Server.cpp
  *
- *  Created on: 27 במאי 2013
+ *  Created on: 1 ביול 2013
  *      Author: yuval
  */
 
 #include "Server.h"
-#include <SFML/Network.hpp>
-#include <stdio.h>
 #include <pthread.h>
-//mutex for the clients vector
+#include "../def.h"
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-Server::Server() {
-	//bind the server
-	if (listenArgs.listener.listen(PORT) != sf::Socket::Done)
+Server::Server():GameBase(EDT_NULL) {
+	if(listener.listen(PORT) != sf::Socket::Done)
 	{
-		printf("failed listening to port:%d \n",PORT);
-		exit(-1);
+		puts("cant listen to port");
+		exit(1);
 	}
-	puts("listening");
-	listenArgs.isListening=true;
-	//start listen thread
-	pthread_create(&listen,NULL,ListenThread,&listenArgs);
+	pthread_create(&listenThread,NULL,Server::ListenThread,this);
 }
 
 Server::~Server() {
-	StopListening();
-	for(auto i:listenArgs.clients)
+	for(auto i:clients)
 	{
-		pthread_cancel(i.recvThread);
+		pthread_cancel(i.thread);
 		delete i.socket;
 	}
 }
 
-void* ListenThread(void* listenThreadArgs) {
-	ListenThreadArgs* args=(ListenThreadArgs*)listenThreadArgs;
-	while(args->isListening)
+void* Server::ListenThread(void* server) {
+	Server* self=(Server*)server;
+	while(true)
 	{
 		TcpSocket* socket=new TcpSocket();
-		//accept a new socket
-		if(args->listener.accept(*socket) != Socket::Done)
+		if(self->listener.accept(*socket) != Socket::Done)
 		{
 			puts("failed to accept client");
 			return 0;
 		}
-		//dont allow other thread to use the vector
-		pthread_mutex_lock( &mutex );
-		printf("connected %d\n",socket->getRemotePort());
-		ClientInfo client;
-		pthread_create(&client.recvThread,NULL,RecvThread,socket);
+		puts("client connected");
+		RecvThreadArgs args;
+		args.self=self;
+		args.socket=socket;
+		SocketThread client;
 		client.socket=socket;
-		args->clients.push_back(client);
-		pthread_mutex_unlock( &mutex );
-
+		pthread_create(&client.thread,NULL,Server::RecvThread,&args);
+		self->clients.push_back(client);
 	}
 	return 0;
 }
 
-void* RecvThread(void* socket) {
-	TcpSocket* s=(TcpSocket*)socket;
-	char in[128];
-	std::size_t received;
+void* Server::RecvThread(void* recvThreadArgs) {
+	RecvThreadArgs* args=(RecvThreadArgs*)recvThreadArgs;
+	Server* self=args->self;
+	TcpSocket* socket=args->socket;
+	Packet packet;
+	int command;
+	float rotY;
+	vector3df pos;
+	ClientInfo info;
+	info.ip=socket->getRemoteAddress();
+	info.port=socket->getRemotePort();
+	Uint32 ip=info.ip.toInteger();
 	while(true)
 	{
-		if (s->receive(in, sizeof(in), received) != sf::Socket::Done)
+		if(socket->receive(packet)!=Socket::Done)
 		{
-			puts("failed to recv msg");
-			exit(0);
+			puts("connection failed");
+			exit(1);
 		}
-		//end of a string end with \0
-		in[received]='\0';
-		//printf("recv from port %d:%s\n",s->getRemotePort(),in);
-
-		Server::GetInstance().Forward(s->getRemotePort(),in);
+		packet>>command;
+		switch(command)
+		{
+		case Command::move:
+			packet>>pos.X;
+			packet>>pos.Y;
+			packet>>pos.Z;
+			packet>>rotY;
+			self->MovePlayer(info,pos,rotY);
+			packet.clear();
+			packet<<Command::move;
+			packet<<ip;
+			packet<<info.port;
+			packet<<pos.X;
+			packet<<pos.Y;
+			packet<<pos.Z;
+			packet<<rotY;
+			self->Forward(socket,packet);
+			packet.clear();
+			break;
+		default:
+			puts("bad package");
+		}
 	}
 	return 0;
 }
 
-void Server::StopListening() {
-
-	if(listenArgs.isListening==true)
-	{
-		listenArgs.isListening=false;
-		//cant stop the thread if adding a new client to the clients vector
-		pthread_mutex_lock( &mutex );
-
-		pthread_cancel(listen);
-		pthread_mutex_unlock( &mutex );
-	}
-}
-/*
- *
- */
-void Server::SendMsg(const char *c) {
-	for(auto i:listenArgs.clients)
-		i.socket->send(c,strlen(c));
+bool Server::update() {
+	return true;
 }
 
-void Server::Forward(unsigned short senderPort, const char* msg) {
-	for(auto i:listenArgs.clients)
-		if(i.socket->getRemotePort()!=senderPort)
-			i.socket->send(msg,strlen(msg));
+void Server::Forward(TcpSocket* sender, Packet packet) {
+	for(auto i:clients)
+		if(i.socket!=sender)
+			i.socket->send(packet);
 }

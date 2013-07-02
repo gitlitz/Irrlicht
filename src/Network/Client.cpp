@@ -6,9 +6,11 @@
  */
 
 #include "Client.h"
-#include "Server.h"
+#include "../def.h"
 #include "../Game.h"
-void* ClientRecvThread(void* socket);
+#include <iostream>
+#include <string>
+
 sf::TcpSocket clientSocket;
 struct LocationPacket
 {
@@ -20,62 +22,68 @@ struct LocationPacket
 	float RotY;
 	float RotZ;
 };
-void StartClient()
-{
-	Game g;
+
+Client::Client() {
 	IpAddress server("127.0.0.1");
 	//connecting to the server
-	if (clientSocket.connect(server, Server::PORT) != sf::Socket::Done)
+	if (socket.connect(server, PORT) != sf::Socket::Done)
 	{
 		puts("connection failed");
 		exit(1);
 	}
-	pthread_t t;
 	//new thread to reciev data from the socket
-	pthread_create(&t,NULL,ClientRecvThread,&clientSocket);
-	//start the game
-	g.start();
-}
-void SendPos(vector3df pos,vector3df rot)
-{
-	//char c[128];
-	//sprintf(c,"%f,%f,%f",pos.X,pos.Y,pos.Z);
-	//clientSocket.send(c,strlen(c));
-	LocationPacket p;
-	p.PosX=pos.X;
-	p.PosY=pos.Y;
-	p.PosZ=pos.Z;
-	p.RotX=rot.X;
-	p.RotY=rot.Y;
-	p.RotZ=rot.Z;
-	clientSocket.send(&p,sizeof(p));
+	pthread_create(&recvThread,NULL,Client::RecvThread,this);
+	camera=smgr->addCameraSceneNodeFPS();
 }
 
-void* ClientRecvThread(void* socket) {
-	TcpSocket *s=(TcpSocket*)socket;
-	size_t recieved;
-	LocationPacket packet;
+Client::~Client() {
+}
+
+bool Client::update() {
+	Packet packet;
+	packet<<Command::move;
+	packet<<camera->getPosition().X;
+	packet<<camera->getPosition().Y;
+	packet<<camera->getPosition().Z;
+	packet<<camera->getRotation().Y;
+	socket.send(packet);
+	if(Input::GetInstance().getKeyState(EKEY_CODE::KEY_KEY_Q)==PRESSED)
+		camera->setInputReceiverEnabled(!camera->isInputReceiverEnabled());
+	return true;
+}
+
+void* Client::RecvThread(void* client) {
+	Client* self=(Client*)client;
+	Packet packet;
+	ClientInfo info;
+	float rotY;
 	vector3df pos;
-	vector3df rot(0,0,0);
+	int command;
+	Uint32 ip;
 	while(true)
 	{
-		s->receive(&packet,sizeof(packet),recieved);
 		//error
-		if(recieved==0)
+		if(self->socket.receive(packet)!=Socket::Done)
 		{
-			puts("failed to recv msg");
+			puts("connection failed");
 			return 0;
 		}
-
-		//sscanf(in,"%f,%f,%f",&pos.X,&pos.Y,&pos.Z);
-		pos.X=packet.PosX;
-		pos.Y=packet.PosY;
-		pos.Z=packet.PosZ;
-		GameBase::seeker->setPosition(pos);
-		rot.X=packet.RotX;
-		rot.Y=packet.RotY;
-		rot.Z=packet.RotZ;
-		GameBase::seeker->setRotation(rot);
+		packet>>command;
+		switch (command) {
+		case Command::move:
+			packet>>ip;
+			info.ip=IpAddress(ip);
+			packet>>info.port;
+			packet>>pos.X;
+			packet>>pos.Y;
+			packet>>pos.Z;
+			packet>>rotY;
+			self->MovePlayer(info,pos,rotY);
+			break;
+		default:
+			puts("bad package");
+			break;
+		}
 	}
 	return 0;
 }

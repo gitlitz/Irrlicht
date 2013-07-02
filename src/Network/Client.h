@@ -14,11 +14,19 @@
 #include <map>
 using namespace std;
 using namespace sf;
+using namespace core;
 //start a client program
-void StartClient();
-/**
- * send pos to the server
- * @param pos pos to be sent
- */
-void SendPos(vector3df pos,vector3df rot);
+class Client:public GameBase
+{
+public:
+	Client();
+	~Client();
+	TcpSocket socket;
+protected:
+	bool update();
+private:
+	pthread_t recvThread;
+	static void* RecvThread(void* client);
+	ICameraSceneNode* camera;
+};
 #endif /* CLIENT_H_ */

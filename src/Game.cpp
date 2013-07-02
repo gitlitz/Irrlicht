@@ -8,6 +8,7 @@
 #include "Game.h"
 #include <stdio.h>
 #include "Network/Client.h"
+using namespace core;
 Game::Game() {
 	//dont display the cursor
 	device->getCursorControl()->setVisible(false);
@@ -22,9 +23,7 @@ Game::~Game() {
 }
 
 bool Game::update() {
-	updateNpc();
-	SendPos(camera->getPosition(),camera->getRotation());
-	//print the position with the p key
+		//print the position with the p key
 	if(Input::GetInstance().getKeyState(KEY_KEY_P)==PRESSED)
 		printf("pos:%1.0f, %1.0f, %1.0f\n",camera->getPosition().X,camera->getPosition().Y,camera->getPosition().Z);
 	//stop mouse capture after using the q key
