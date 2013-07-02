@@ -12,13 +12,15 @@ IVideoDriver* GameBase::driver=NULL;
 ISceneManager *GameBase::smgr=NULL;
 IGUIEnvironment *GameBase::guienv=NULL;
 GameBase::GameBase(E_DRIVER_TYPE driver) {
-	// TODO Auto-generated constructor stub
 	device = createDevice(video::EDT_OPENGL,dimension2d<u32>(640, 480), 16, false,false,true,&Input::GetInstance());
 	this->driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	guienv = device->getGUIEnvironment();
-
+	playerMesh = smgr->getMesh("media/sydney.md2");
+	playerTexture=this->driver->getTexture("media/sydney.bmp");
 	create_mapSelector();
+	const core::aabbox3d<f32>& box = playerMesh->getBoundingBox();
+	radius = box.MaxEdge - box.getCenter();
 }
 
 GameBase::~GameBase() {
@@ -55,25 +57,30 @@ void GameBase::create_mapSelector() {
 }
 
 void GameBase::MovePlayer(ClientInfo info, vector3df position,float rotY) {
-	ISceneNode* node;
+	IAnimatedMeshSceneNode* node;
 	if(players.find(info)==players.end())
 	{
 		//todo:error here
 		puts("new node");
-		node=smgr->addCubeSceneNode(100);//sampleNode->clone();
+		node=CreateNewPlayerNode();
+		ITriangleSelector* selector=smgr->createTriangleSelector(node);
+		node->setTriangleSelector(selector);
+		selector->drop();
 		players[info]=node;
 	}
 	else
 		node=players[info];
-	node->setPosition(position);
+	node->setPosition(position-radius);
+	vector3df rot=node->getRotation();
+	rot.Y=rotY;
+	node->setRotation(rot);
 
 }
 
 void GameBase::loadSampleNode() {
-	IAnimatedMesh* mesh = smgr->getMesh("media/sydney.md2");
 
-	sampleNode=smgr->addAnimatedMeshSceneNode(mesh);
-	sampleNode->setMaterialTexture( 0, driver->getTexture("media/sydney.bmp") );
+	sampleNode=smgr->addAnimatedMeshSceneNode(playerMesh);
+	sampleNode->setMaterialTexture( 0, playerTexture );
 	sampleNode->setPosition(vector3df(1278, 462, 886));
 	sampleNode->setMD2Animation(EMD2_ANIMATION_TYPE::EMAT_STAND);
 	//lighting
@@ -87,4 +94,12 @@ void GameBase::loadSampleNode() {
 	sampleNode->addAnimator(collision);
 	collision->drop();
 	*/
+}
+
+IAnimatedMeshSceneNode* GameBase::CreateNewPlayerNode() {
+	IAnimatedMeshSceneNode* node=smgr->addAnimatedMeshSceneNode(playerMesh);
+	node->setMaterialTexture( 0, playerTexture );
+	node->setMD2Animation(EMD2_ANIMATION_TYPE::EMAT_STAND);
+	node->setMaterialFlag(EMF_LIGHTING, false);
+	return node;
 }

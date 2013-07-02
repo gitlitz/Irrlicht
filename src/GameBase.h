@@ -23,7 +23,8 @@ using namespace gui;
 using namespace core;
 enum Command
 {
-	move
+	move,
+	score
 };
 
 struct ClientInfo
@@ -68,13 +69,18 @@ protected:
 	ITriangleSelector *mapSelector;
 	IAnimatedMeshSceneNode* sampleNode;
 	void MovePlayer(ClientInfo info,core::vector3df position,float rotY);
-
+	IAnimatedMeshSceneNode* CreateNewPlayerNode();
+	vector3df radius;
 private:
 	//init the selector for the map
 	void create_mapSelector();
 	void loadSampleNode();
 
-	std::map<ClientInfo,ISceneNode*> players;
+	std::map<ClientInfo,IAnimatedMeshSceneNode*> players;
+
+	IAnimatedMesh* playerMesh;
+	ITexture* playerTexture;
+
 };
 
 #endif /* GAMEBASE_H_ */

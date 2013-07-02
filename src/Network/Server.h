@@ -36,6 +36,8 @@ private:
 	pthread_t listenThread;
 	TcpListener listener;
 	std::vector<SocketThread> clients;
+	ISceneCollisionManager* collMan;
+	ISceneNode* shoot(Packet packet);
 };
 
 #endif /* SERVER_H_ */

@@ -11,6 +11,7 @@
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 Server::Server():GameBase(EDT_NULL) {
+	collMan=smgr->getSceneCollisionManager();
 	if(listener.listen(PORT) != sf::Socket::Done)
 	{
 		puts("cant listen to port");
@@ -58,6 +59,7 @@ void* Server::RecvThread(void* recvThreadArgs) {
 	float rotY;
 	vector3df pos;
 	ClientInfo info;
+	ISceneNode* hitNode;
 	info.ip=socket->getRemoteAddress();
 	info.port=socket->getRemotePort();
 	Uint32 ip=info.ip.toInteger();
@@ -88,6 +90,15 @@ void* Server::RecvThread(void* recvThreadArgs) {
 			self->Forward(socket,packet);
 			packet.clear();
 			break;
+		case Command::score:
+			hitNode= self->shoot(packet);
+			if(hitNode)
+			{
+				packet.clear();
+				packet<<Command::score;
+				socket->send(packet);
+			}
+			break;
 		default:
 			puts("bad package");
 		}
@@ -103,4 +114,24 @@ void Server::Forward(TcpSocket* sender, Packet packet) {
 	for(auto i:clients)
 		if(i.socket!=sender)
 			i.socket->send(packet);
+}
+ISceneNode* Server::shoot(Packet packet)
+{
+	vector3df start;
+	packet>>start.X;
+	packet>>start.Y;
+	packet>>start.Z;
+	vector3df end;
+	packet>>end.X;
+	packet>>end.Y;
+	packet>>end.Z;
+
+	core::line3d<f32> ray;
+	ray.start = start;
+	ray.end = end;
+	core::vector3df intersection;
+	core::triangle3df hitTriangle;
+
+	ISceneNode * selectedSceneNode=collMan->getSceneNodeAndCollisionPointFromRay(ray,intersection,hitTriangle);
+	return (selectedSceneNode);
 }

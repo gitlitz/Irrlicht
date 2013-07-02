@@ -11,18 +11,6 @@
 #include <iostream>
 #include <string>
 
-sf::TcpSocket clientSocket;
-struct LocationPacket
-{
-	float PosX;
-	float PosY;
-	float PosZ;
-
-	float RotX;
-	float RotY;
-	float RotZ;
-};
-
 Client::Client() {
 	IpAddress server("127.0.0.1");
 	//connecting to the server
@@ -33,10 +21,11 @@ Client::Client() {
 	}
 	//new thread to reciev data from the socket
 	pthread_create(&recvThread,NULL,Client::RecvThread,this);
-	camera=smgr->addCameraSceneNodeFPS();
+	initCamera();
 }
 
 Client::~Client() {
+	camera->removeAnimators();
 }
 
 bool Client::update() {
@@ -47,8 +36,17 @@ bool Client::update() {
 	packet<<camera->getPosition().Z;
 	packet<<camera->getRotation().Y;
 	socket.send(packet);
+	packet.clear();
+	if(Input::GetInstance().getKeyState(EKEY_CODE::KEY_KEY_E)==PRESSED)
+	{
+		shoot();
+	}
 	if(Input::GetInstance().getKeyState(EKEY_CODE::KEY_KEY_Q)==PRESSED)
 		camera->setInputReceiverEnabled(!camera->isInputReceiverEnabled());
+	stringw tmp(L"score:");
+	tmp+=score;
+	device->setWindowCaption(tmp.c_str());
+
 	return true;
 }
 
@@ -80,10 +78,66 @@ void* Client::RecvThread(void* client) {
 			packet>>rotY;
 			self->MovePlayer(info,pos,rotY);
 			break;
+		case Command::score:
+			puts("score");
+			self->score++;
+			packet.clear();
+			break;
 		default:
 			puts("bad package");
 			break;
 		}
 	}
 	return 0;
+}
+
+void Client::initCamera() {
+	ISceneNodeAnimatorCollisionResponse* anim;
+	//setup the keys
+	SKeyMap keyMap[9];
+	keyMap[0].Action = EKA_MOVE_FORWARD;
+	keyMap[0].KeyCode = KEY_UP;
+	keyMap[1].Action = EKA_MOVE_FORWARD;
+	keyMap[1].KeyCode = KEY_KEY_W;
+
+	keyMap[2].Action = EKA_MOVE_BACKWARD;
+	keyMap[2].KeyCode = KEY_DOWN;
+	keyMap[3].Action = EKA_MOVE_BACKWARD;
+	keyMap[3].KeyCode = KEY_KEY_S;
+
+	keyMap[4].Action = EKA_STRAFE_LEFT;
+	keyMap[4].KeyCode = KEY_LEFT;
+	keyMap[5].Action = EKA_STRAFE_LEFT;
+	keyMap[5].KeyCode = KEY_KEY_A;
+
+	keyMap[6].Action = EKA_STRAFE_RIGHT;
+	keyMap[6].KeyCode = KEY_RIGHT;
+	keyMap[7].Action = EKA_STRAFE_RIGHT;
+	keyMap[7].KeyCode = KEY_KEY_D;
+	keyMap[8].Action = EKA_JUMP_UP;
+	keyMap[8].KeyCode = KEY_SPACE;
+
+	camera=smgr->addCameraSceneNodeFPS(0, 100.0f, .3f, -1, keyMap, 9, true, 5.f);
+	//add dynamic light
+	smgr->addLightSceneNode(camera);
+	camera->setPosition(vector3df(1478, 462, 886));
+	anim = smgr->createCollisionResponseAnimator(
+			mapSelector, camera,2*radius);
+	camera->addAnimator(anim);
+	anim->drop();
+
+}
+
+void Client::shoot() {
+	Packet packet;
+	packet<<Command::score;
+	vector3df start=camera->getPosition();
+	packet<<start.X;
+	packet<<start.Y;
+	packet<<start.Z;
+	vector3df end=start + (camera->getTarget() - start).normalize() * 1000.0f;
+	packet<<end.X;
+	packet<<end.Y;
+	packet<<end.Z;
+	socket.send(packet);
 }

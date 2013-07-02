@@ -28,5 +28,8 @@ private:
 	pthread_t recvThread;
 	static void* RecvThread(void* client);
 	ICameraSceneNode* camera;
+	int score=0;
+	void initCamera();
+	void shoot();
 };
 #endif /* CLIENT_H_ */
